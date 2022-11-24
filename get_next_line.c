@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/11/23 17:27:41 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/11/24 17:06:54 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define BUFFER_SIZE 5
-
-// checkchar : this function checks whether we are at the end of a line (\n) or not each time you run it
+//checkchar : this function checks whether we are at the end of a line (\n) or not each time you run it
 
 int checkchar(char *buffy)
 {
@@ -29,7 +27,7 @@ int checkchar(char *buffy)
 	{
 		i++;
 		if (buffy[i] == '\n')
-			return (i);
+			return (1);
 	}
 	return (0);
 }
@@ -62,6 +60,11 @@ char	*ft_strjoin(char *line, char const *buffy)
 	j = 0;
 	length_line = ft_strlen(line);
 	length_buffy = ft_strlen(buffy);
+	if (!line)
+	{
+		line = malloc(sizeof(char) * (1));
+		line[0] = '\0';
+	}
 	if (!line || !buffy)
 		return (NULL);
 	new_line = malloc(sizeof(char) * (length_line + length_buffy + 1));
@@ -77,26 +80,26 @@ char	*ft_strjoin(char *line, char const *buffy)
 	return (new_line);
 }
 
-size_t	trim_buffy(char *dst, const char *src, size_t dstsize)
+void	trim_buffy(char *buffy)
 {
-	size_t	len;
-	size_t	i;
+	size_t	before;
+	size_t	after;
 
-	i = 0;
-	len = 0;
-	while (src[len] != '\0')
-		len++;
-	if (dstsize == 0)
-		return (len);
-	while (i < dstsize)
+	before = 0;
+	after = 0;
+	if (buffy[before] == '\0')
+		return ;
+	while (buffy[before] != '\n')
+		before++;
+	before++;
+	while (buffy[before])
 	{
-		dst[i] = src[i];
-		i++;
+		buffy[after] = buffy[before];
+		after++;
+		before++;
 	}
-	return (len);
+	buffy[after] = '\0';
 }
-
-// read_and_save : reads a file and calls strjoin to save them
 
 char *get_next_line(int fd)
 {
@@ -107,37 +110,42 @@ char *get_next_line(int fd)
 	
 	i = 0;
 	line = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!line)
-		return (0);
+	line[0] = '\0';
+	if (!line || fd < 0)	
+		return (NULL);
 	is_read = 1;
-	while (checkchar(buffy) == 0 && is_read > 0)
+	while (checkchar(buffy) != 1 && is_read > 0)
 	{
 		is_read = read(fd, buffy, BUFFER_SIZE);
-		line = ft_strjoin(line, buffy);
+		if (is_read < BUFFER_SIZE)
+		{
+			if (is_read == -1 || (is_read == 0 && *line == '\0'))
+				return (free(line), NULL);
+			buffy [is_read] = '\0';
+			line = ft_strjoin(line, buffy);
+			return (line);
+		}
+	line = ft_strjoin(line, buffy);
 	}
-	i = checkchar(buffy);
-	trim_buffy(buffy, &buffy[i + 1], ft_strlen(&buffy[i + 1]) + 1);
+	trim_buffy(buffy);
+	free(line);
 	return (line);
 }
 
-// char *get_next_line(int fd)
+// int	main(void)
 // {
 // 	char *line;
+// 	int fd;
+// 	int	i;
 
-// 	line = read_and_save(fd);
-// 	return (line);
+// 	i = 0;
+// 	fd = open("text.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	while(line)
+// 	{
+// 		printf("%s", line);
+// 		line = get_next_line(fd);
+// 		i++;
+// 	}
+// 	close(fd);
 // }
-
-int	main(void)
-{
-	int fd;
-	int	i;
-
-	i = 0;
-	fd = open("text.txt", O_RDONLY);
-	while(i < 10)
-	{
-		printf("GNL[%d]: %s\n", i, get_next_line(fd));
-		i++;
-	}
-}
