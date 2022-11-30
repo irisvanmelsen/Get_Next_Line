@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/11/28 15:24:34 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/11/30 12:28:30 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,45 +35,21 @@ int checkchar(char *buffy)
 }
 
 // strlen : checks the length of a string
-
+/**
+ * @param s doet shit
+*/
 size_t	ft_strlen(const char *s)
 {
 	int	length;
 
 	length = 0;
+	if (!s)
+		return (0);
 	while (s[length] != '\0')
 	{
 		length++;
 	}
 	return (length);
-}
-
-char *nextline(char *line)
-{
-	int	i;
-	char *str;
-
-	i = 0;
-	if (!line)
-		return (NULL);
-	if (line[i] != '\0' && line[i] != '\n')
-		i++;
-	str = malloc(sizeof(char) * (i + 2));
-	if (!str)
-		return (free(line), NULL);
-	i = 0;
-	while (line[i] != '\0' && line[i] != '\n')
-	{
-		str[i] = line[i];
-		i++;
-	}
-	if (line[i] == '\n')
-	{
-		str[i] = '\n';
-		i++;
-	}
-	str[i] = '\0';
-	return (free(line), str);
 }
 
 // strjoin : joins two strings together as a third new string
@@ -130,6 +106,49 @@ void	trim_buffy(char *buffy)
 	buffy[after] = '\0';
 }
 
+char	*trim_malloc(char *line)
+{
+	char *result;
+	int	length;
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	length = ft_strlen(line);
+	// printf("check length & line: %i, %s", length, line);
+	result = malloc(sizeof(char) * (length + 1));
+	if (!result)
+		return (free(line), NULL);
+	while (line[j])
+	{
+		result[i] = line[j];
+		i++;
+		j++;
+	}
+	result[i] = '\0';
+	free(line);
+	return (result);
+}
+
+// char *reading(char *buffy, char *line, int is_read)
+// {
+// 	if (is_read == -1 || (is_read == 0 && *line == '\0'))
+// 	{
+// 		buffy[0] = '\0';
+// 		return (free(line), NULL);
+// 	}
+// 	buffy [is_read] = '\0';
+// 	line = ft_strjoin(line, buffy);
+// 	if (!line)
+// 		return (NULL);
+// 	line = trim_malloc(line);
+// 	if (!line)
+// 		return (NULL);
+// 	trim_buffy(buffy);
+// 	return (line);
+// }
+
 char *get_next_line(int fd)
 {
 	static char	buffy[BUFFER_SIZE + 1];
@@ -151,6 +170,7 @@ char *get_next_line(int fd)
 		is_read = read(fd, buffy, BUFFER_SIZE);
 		if (is_read < BUFFER_SIZE)
 		{
+			// line = reading(buffy, line, is_read);
 			if (is_read == -1 || (is_read == 0 && *line == '\0'))
 			{
 				buffy[0] = '\0';
@@ -160,6 +180,7 @@ char *get_next_line(int fd)
 			line = ft_strjoin(line, buffy);
 			if (!line)
 				return (NULL);
+			line = trim_malloc(line);
 			trim_buffy(buffy);
 			return (line);
 		}
@@ -167,9 +188,12 @@ char *get_next_line(int fd)
 	line = ft_strjoin(line, buffy);
 	if (!line)
 		return (NULL);
+	// if (!line)
+	// 	return (NULL);
 	trim_buffy(buffy);
-	// line = nextline(line);
-	// free(line);
+	line = trim_malloc(line);
+	if (!line)
+		return (NULL);
 	return (line);
 }
 
