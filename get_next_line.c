@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/11/30 12:28:30 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/11/30 16:07:16 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,6 @@ char	*trim_malloc(char *line)
 	i = 0;
 	j = 0;
 	length = ft_strlen(line);
-	// printf("check length & line: %i, %s", length, line);
 	result = malloc(sizeof(char) * (length + 1));
 	if (!result)
 		return (free(line), NULL);
@@ -131,69 +130,37 @@ char	*trim_malloc(char *line)
 	return (result);
 }
 
-// char *reading(char *buffy, char *line, int is_read)
-// {
-// 	if (is_read == -1 || (is_read == 0 && *line == '\0'))
-// 	{
-// 		buffy[0] = '\0';
-// 		return (free(line), NULL);
-// 	}
-// 	buffy [is_read] = '\0';
-// 	line = ft_strjoin(line, buffy);
-// 	if (!line)
-// 		return (NULL);
-// 	line = trim_malloc(line);
-// 	if (!line)
-// 		return (NULL);
-// 	trim_buffy(buffy);
-// 	return (line);
-// }
-
 char *get_next_line(int fd)
 {
 	static char	buffy[BUFFER_SIZE + 1];
-	int 		is_read;
-	int 		i;
 	char 		*line;
+	int 		is_read;
 
-	i = 0;
 	line = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!line)
 		return (NULL);
 	line[0] = '\0';
-	while (checkchar(buffy) != 1)
+	if (*buffy != '\0')
+		line = ft_strjoin(line, buffy);
+	while (checkchar(buffy) != 1 && line)
 	{
-		if (*buffy != '\0')
-			line = ft_strjoin(line, buffy);
+		is_read = read(fd, buffy, BUFFER_SIZE);
+		if (is_read == -1 || (is_read == 0 && *line == '\0'))
+		{
+			buffy[0] = '\0';
+			return (free(line), NULL);
+		}
+		buffy [is_read] = '\0';
+		line = ft_strjoin(line, buffy);
 		if (!line)
 			return (NULL);
-		is_read = read(fd, buffy, BUFFER_SIZE);
 		if (is_read < BUFFER_SIZE)
-		{
-			// line = reading(buffy, line, is_read);
-			if (is_read == -1 || (is_read == 0 && *line == '\0'))
-			{
-				buffy[0] = '\0';
-				return (free(line), NULL);
-			}
-			buffy [is_read] = '\0';
-			line = ft_strjoin(line, buffy);
-			if (!line)
-				return (NULL);
-			line = trim_malloc(line);
-			trim_buffy(buffy);
-			return (line);
-		}
+			break ;
 	}
-	line = ft_strjoin(line, buffy);
 	if (!line)
 		return (NULL);
-	// if (!line)
-	// 	return (NULL);
 	trim_buffy(buffy);
 	line = trim_malloc(line);
-	if (!line)
-		return (NULL);
 	return (line);
 }
 
