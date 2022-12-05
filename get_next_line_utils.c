@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 12:34:14 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 13:08:49 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/05 17:35:29 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,28 @@ size_t	ft_strlen(const char *s)
 		length++;
 	}
 	return (length);
+}
+
+// ft_calloc:
+// this function allocates a specified amount of
+// memory and then initialize it to zero
+// it is similar to malloc but malloc does not initialize it to zero
+// we do this by making sure we allocate enough space through malloc
+// then we continue until to do so until i is equal to our count * size
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	char	*str;
+	size_t	i;
+
+	str = malloc(count * size);
+	i = 0;
+	if (!str)
+		return (str);
+	while (i < (count * size))
+	{
+		str[i] = '\0';
+		i++;
+	}
+	return (str);
 }

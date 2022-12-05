@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/24 17:04:53 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 13:19:45 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/05 17:36:40 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,6 @@
 char	*get_next_line(int fd);
 int		checkchar(char *buffy);
 size_t	ft_strlen(const char *s);
+void	*ft_calloc(size_t count, size_t size);
 
 #endif

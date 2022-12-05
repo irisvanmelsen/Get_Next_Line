@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 16:30:38 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/05 19:17:44 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,28 +121,27 @@ char	*trim_malloc(char *line)
 	return (result);
 }
 
-// ft_calloc:
-// this function allocates a specified amount of
-// memory and then initialize it to zero
-// it is similar to malloc but malloc does not initialize it to zero
-// we do this by making sure we allocate enough space through malloc
-// then we continue until to do so until i is equal to our count * size
-
-void	*ft_calloc(size_t count, size_t size)
+char *line_ongoing(char *line, char *buffy, int fd)
 {
-	char	*str;
-	size_t	i;
-
-	str = malloc(count * size);
-	i = 0;
-	if (!str)
-		return (str);
-	while (i < (count * size))
+	int	is_read;
+	
+	while (checkchar(buffy) != 1 && line)
 	{
-		str[i] = '\0';
-		i++;
+		is_read = read(fd, buffy, BUFFER_SIZE);
+		if (is_read == -1 || (is_read == 0 && *line == '\0'))
+		{
+			buffy[0] = '\0';
+			free(line);
+			return (NULL);
+		}
+		buffy [is_read] = '\0';
+		line = ft_strjoin(line, buffy);
+		if (is_read < BUFFER_SIZE)
+			break ;
+		if (!line)
+			return (NULL);	
 	}
-	return (str);
+	return (line);
 }
 
 // get_next_line:
@@ -163,25 +162,13 @@ char	*get_next_line(int fd)
 {
 	static char	buffy[BUFFER_SIZE + 1];
 	char		*line;
-	int			is_read;
 
 	if (fd < 0)
 		return (NULL);
 	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
 	if (*buffy != '\0')
 		line = ft_strjoin(line, buffy);
-	while (checkchar(buffy) != 1 && line)
-	{
-		is_read = read(fd, buffy, BUFFER_SIZE);
-		if (is_read == -1 || (is_read == 0 && *line == '\0'))
-			return (buffy[0] = '\0', free(line), NULL);
-		buffy [is_read] = '\0';
-		line = ft_strjoin(line, buffy);
-		if (!line)
-			return (NULL);
-		if (is_read < BUFFER_SIZE)
-			break ;
-	}
+	line = line_ongoing(line, buffy, fd);
 	if (!line)
 		return (NULL);
 	trim_buffy(buffy);
