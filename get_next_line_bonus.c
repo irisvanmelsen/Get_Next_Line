@@ -1,18 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 16:30:38 by ivan-mel         ###   ########.fr       */
+/*   Created: 2022/12/05 13:28:59 by ivan-mel          #+#    #+#             */
+/*   Updated: 2022/12/05 16:36:43 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //  #define BUFFER_SIZE 10
 
 #include "get_next_line.h"
+#include <limits.h>
 
 // strjoin:
 // joins two strings together as a third new string.
@@ -161,7 +162,7 @@ void	*ft_calloc(size_t count, size_t size)
 
 char	*get_next_line(int fd)
 {
-	static char	buffy[BUFFER_SIZE + 1];
+	static char	buffy[OPEN_MAX][BUFFER_SIZE + 1];
 	char		*line;
 	int			is_read;
 
@@ -169,14 +170,14 @@ char	*get_next_line(int fd)
 		return (NULL);
 	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
 	if (*buffy != '\0')
-		line = ft_strjoin(line, buffy);
-	while (checkchar(buffy) != 1 && line)
+		line = ft_strjoin(line, buffy[fd]);
+	while (checkchar(buffy[fd]) != 1 && line)
 	{
-		is_read = read(fd, buffy, BUFFER_SIZE);
+		is_read = read(fd, &buffy[fd], BUFFER_SIZE);
 		if (is_read == -1 || (is_read == 0 && *line == '\0'))
-			return (buffy[0] = '\0', free(line), NULL);
-		buffy [is_read] = '\0';
-		line = ft_strjoin(line, buffy);
+			return (buffy[fd][0] = '\0', free(line), NULL);
+		buffy[fd][is_read] = '\0';
+		line = ft_strjoin(line, buffy[fd]);
 		if (!line)
 			return (NULL);
 		if (is_read < BUFFER_SIZE)
@@ -184,7 +185,7 @@ char	*get_next_line(int fd)
 	}
 	if (!line)
 		return (NULL);
-	trim_buffy(buffy);
+	trim_buffy(buffy[fd]);
 	line = trim_malloc(line);
 	return (line);
 }
