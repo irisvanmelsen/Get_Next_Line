@@ -6,11 +6,35 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 13:29:28 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 13:29:31 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/06 11:44:10 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
+
+// ft_calloc:
+// this function allocates a specified amount of
+// memory and then initialize it to zero
+// it is similar to malloc but malloc does not initialize it to zero
+// we do this by making sure we allocate enough space through malloc
+// then we continue until to do so until i is equal to our count * size
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	char	*str;
+	size_t	i;
+
+	str = malloc(count * size);
+	i = 0;
+	if (!str)
+		return (str);
+	while (i < (count * size))
+	{
+		str[i] = '\0';
+		i++;
+	}
+	return (str);
+}
 
 // checkchar: 
 // this goes through 'buffy' to find out whether it has a

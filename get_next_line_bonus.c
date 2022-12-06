@@ -6,27 +6,26 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 13:28:59 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/05 16:36:43 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/06 12:42:14 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //  #define BUFFER_SIZE 10
 
-#include "get_next_line.h"
-#include <limits.h>
+#include "get_next_line_bonus.h"
 
 // strjoin:
 // joins two strings together as a third new string.
 // the function checks whether the line and the buffer exist
-// if it exists it will then allocate enough memory for both of them (malloc)
-// then it makes new string called new_line equal to line by itterating through
+// if it exists it will then allocate enough memory for both of them
+// then it makes new string called new_line equal to line by iterating through
 // it afterwards it does the same with the buffer as long as there
 // is no terminating '\0' character or new line '\n' character
 // if buffy is at a new line then we have to make sure we copy it
 // correctly by also adding a '\n' to our new_line after
 // which we end with a terminating character '\0'
 
-char	*ft_strjoin(char *line, char const *buffy)
+static char	*ft_strjoin(char *line, char const *buffy)
 {
 	char	*new_line;
 	int		i;
@@ -65,7 +64,7 @@ char	*ft_strjoin(char *line, char const *buffy)
 // then we make a buffer[after] which is equal to our
 // previous buffer up until it reached the '\0' or '\n'
 
-void	trim_buffy(char *buffy)
+static void	trim_buffy(char *buffy)
 {
 	size_t	before;
 	size_t	after;
@@ -98,7 +97,7 @@ void	trim_buffy(char *buffy)
 // then we say that the char result is equal to the line
 // and finally add the terminating '\0' character
 
-char	*trim_malloc(char *line)
+static char	*trim_malloc(char *line)
 {
 	char	*result;
 	int		length;
@@ -122,67 +121,56 @@ char	*trim_malloc(char *line)
 	return (result);
 }
 
-// ft_calloc:
-// this function allocates a specified amount of
-// memory and then initialize it to zero
-// it is similar to malloc but malloc does not initialize it to zero
-// we do this by making sure we allocate enough space through malloc
-// then we continue until to do so until i is equal to our count * size
+// line_ongoing:
+// we will go into the while loop as long as buffy
+// is not at a "\n" newline, then it reads and checks
+// whether read is not negative or empty, frees and returns
+// then we add a "\0" terminating character and join the strings
+// if what we read is smaller than buffer size we break out of it
+// if there is no line then we return NULL
 
-void	*ft_calloc(size_t count, size_t size)
+static char	*line_ongoing(char *line, char *buffy, int fd)
 {
-	char	*str;
-	size_t	i;
+	int	is_read;
 
-	str = malloc(count * size);
-	i = 0;
-	if (!str)
-		return (str);
-	while (i < (count * size))
+	while (checkchar(buffy) != 1 && line)
 	{
-		str[i] = '\0';
-		i++;
+		is_read = read(fd, buffy, BUFFER_SIZE);
+		if (is_read == -1 || (is_read == 0 && *line == '\0'))
+		{
+			buffy[0] = '\0';
+			free(line);
+			return (NULL);
+		}
+		buffy [is_read] = '\0';
+		line = ft_strjoin(line, buffy);
+		if (is_read < BUFFER_SIZE)
+			break ;
+		if (!line)
+			return (NULL);
 	}
-	return (str);
+	return (line);
 }
 
 // get_next_line:
 // this function allocates space for our BUFFER_SIZE
-// we say line is equal to the line and buffy as long
-// as buffy exists, afterwards we check whether there is
-// a new line '\n' character in buffy or not
-// if it is not then we continue in the while loop which 
-// reads the amount of BUFFER_SIZE from the file and
-// joins the buffer to the line by calling ft_strjoin
-// whe there is no line or we read zero or less then
-// the function will return 0
-// if there is a new line then we have to trim buffy
-// and afterwards trim malloc so we don't have too
-// much space allocated, at last we can return the line
+// if calls line_ongoing which reads and fills line
+// as long as it is not at a "\n" new line
+// otherwise it calls trim buffy and trim malloc
+// which makes sure that there is not too much space
+// allocated and we don't have any leaks
 
 char	*get_next_line(int fd)
 {
 	static char	buffy[OPEN_MAX][BUFFER_SIZE + 1];
 	char		*line;
-	int			is_read;
 
 	if (fd < 0)
 		return (NULL);
 	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
 	if (*buffy != '\0')
 		line = ft_strjoin(line, buffy[fd]);
-	while (checkchar(buffy[fd]) != 1 && line)
-	{
-		is_read = read(fd, &buffy[fd], BUFFER_SIZE);
-		if (is_read == -1 || (is_read == 0 && *line == '\0'))
-			return (buffy[fd][0] = '\0', free(line), NULL);
-		buffy[fd][is_read] = '\0';
-		line = ft_strjoin(line, buffy[fd]);
-		if (!line)
-			return (NULL);
-		if (is_read < BUFFER_SIZE)
-			break ;
-	}
+	line = line_ongoing(line, buffy[fd], fd);
 	if (!line)
 		return (NULL);
 	trim_buffy(buffy[fd]);
