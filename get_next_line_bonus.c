@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 13:28:59 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/06 12:42:14 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/07 15:41:02 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 // correctly by also adding a '\n' to our new_line after
 // which we end with a terminating character '\0'
 
-static char	*ft_strjoin(char *line, char const *buffy)
+static char	*ft_strjoin(char *line, char *buffy)
 {
 	char	*new_line;
 	int		i;
@@ -33,8 +33,6 @@ static char	*ft_strjoin(char *line, char const *buffy)
 
 	i = 0;
 	j = 0;
-	if (!line || !buffy)
-		return (NULL);
 	new_line = malloc(sizeof(char) * (ft_strlen(line) + ft_strlen(buffy) + 1));
 	if (!new_line)
 		return (free(line), NULL);
@@ -135,6 +133,10 @@ static char	*line_ongoing(char *line, char *buffy, int fd)
 
 	while (checkchar(buffy) != 1 && line)
 	{
+		if (*buffy != '\0')
+			line = ft_strjoin(line, buffy);
+		if (!line)
+			return (NULL);
 		is_read = read(fd, buffy, BUFFER_SIZE);
 		if (is_read == -1 || (is_read == 0 && *line == '\0'))
 		{
@@ -143,12 +145,10 @@ static char	*line_ongoing(char *line, char *buffy, int fd)
 			return (NULL);
 		}
 		buffy [is_read] = '\0';
-		line = ft_strjoin(line, buffy);
 		if (is_read < BUFFER_SIZE)
 			break ;
-		if (!line)
-			return (NULL);
 	}
+	line = ft_strjoin(line, buffy);
 	return (line);
 }
 
@@ -168,13 +168,18 @@ char	*get_next_line(int fd)
 	if (fd < 0)
 		return (NULL);
 	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
-	if (*buffy != '\0')
-		line = ft_strjoin(line, buffy[fd]);
-	line = line_ongoing(line, buffy[fd], fd);
 	if (!line)
 		return (NULL);
+	line = line_ongoing(line, buffy[fd], fd);
+	if (!line)
+	{
+		buffy[fd][0] = '\0';
+		return (NULL);
+	}
 	trim_buffy(buffy[fd]);
 	line = trim_malloc(line);
+	if (!line)
+		buffy[fd][0] = '\0';
 	return (line);
 }
 
