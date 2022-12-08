@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 13:28:59 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/07 15:41:02 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/08 13:58:17 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ char	*get_next_line(int fd)
 
 	if (fd < 0)
 		return (NULL);
-	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
+	line = ft_calloc(sizeof(BUFFER_SIZE + 1), 1);
 	if (!line)
 		return (NULL);
 	line = line_ongoing(line, buffy[fd], fd);
@@ -186,25 +186,24 @@ char	*get_next_line(int fd)
 // int	main(void)
 // {
 // 	char *line;
+// 	char *line1;
 // 	int fd;
-// 	int	i;
+// 	int	fd1;
 
-	// i = 0;
-	// fd = open("text.txt", O_RDONLY);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
+// 	fd = open("text1.txt", O_RDONLY);
+// 	fd1 = open("txt2.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	line1 = get_next_line(fd1);
 // 	while(line)
 // 	{
 // 		printf("%s", line);
 // 		line = get_next_line(fd);
-// 		i++;
+// 	}
+// 	while (line1)
+// 	{
+// 		printf("%s", line1);
+// 		line1 = get_next_line(fd1);
 // 	}
 // 	close(fd);
+// 	close (fd1);
 // }

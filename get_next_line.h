@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/24 17:04:53 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/07 14:31:21 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/07 18:26:30 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,14 @@
 
 # include <unistd.h>
 # include <stdlib.h>
+# include <limits.h>
 
 # ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10
+# endif
+
+# if BUFFER_SIZE >= INT_MAX
+#  undef BUFFER_SIZE
 #  define BUFFER_SIZE 10
 # endif
 

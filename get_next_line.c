@@ -6,7 +6,7 @@
 /*   By: ivan-mel <ivan-mel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 14:33:01 by ivan-mel          #+#    #+#             */
-/*   Updated: 2022/12/07 15:08:34 by ivan-mel         ###   ########.fr       */
+/*   Updated: 2022/12/08 13:58:09 by ivan-mel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ char	*get_next_line(int fd)
 
 	if (fd < 0)
 		return (NULL);
-	line = calloc(sizeof(BUFFER_SIZE + 1), 1);
+	line = ft_calloc(sizeof(BUFFER_SIZE + 1), 1);
 	if (!line)
 		return (NULL);
 	line = line_ongoing(line, buffy, fd);
@@ -187,24 +187,13 @@ char	*get_next_line(int fd)
 // {
 // 	char *line;
 // 	int fd;
-// 	int	i;
 
-	// i = 0;
-	// fd = open("text.txt", O_RDONLY);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
-	// printf("%s", line);
-	// line = get_next_line(fd);
+// 	fd = open("text.txt", O_RDONLY);
+// 	line = get_next_line(fd);
 // 	while(line)
 // 	{
 // 		printf("%s", line);
 // 		line = get_next_line(fd);
-// 		i++;
 // 	}
 // 	close(fd);
 // }
